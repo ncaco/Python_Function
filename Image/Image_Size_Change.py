@@ -16,7 +16,10 @@ def resize_image(input_path, output_path, size=(1024, 1024)):
         print(f"이미지 리사이즈 중 오류 발생: {str(e)}")
         return False
 
-# 실행
-input_file = "은하수 도장.png"
-output_file = "은하수 도장.png"
-resize_image(input_file, output_file)
+if __name__ == "__main__":
+    # 사용 예시
+    image_url = input("이미지 경로를 입력하세요: ")
+    resize_image(image_url)
+
+
+

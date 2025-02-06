@@ -36,7 +36,7 @@ def download_image(url: str) -> str:
 
 # 사용 예시
 if __name__ == "__main__":
-    image_url = "https://example.com/image.jpg"
+    image_url = "https://thumbs.dreamstime.com/b/fire-flame-icon-isolated-bonfire-sign-emoticon-symbol-white-emoji-logo-illustration-vector-142833014.jpg"
     try:
         saved_path = download_image(image_url)
         print(f"이미지가 성공적으로 저장되었습니다: {saved_path}")

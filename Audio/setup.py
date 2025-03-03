@@ -10,6 +10,8 @@ def install_requirements():
         "numpy",
         "transformers",
         "tkinter",
+        "standard-aifc",
+        "soundfile",
     ]
     
     print("필요한 패키지 설치 중...")

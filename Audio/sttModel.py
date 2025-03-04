@@ -33,7 +33,7 @@ except ImportError:
 logging.set_verbosity_error()
 
 class STTModel:
-    def __init__(self, model_name="openai/whisper-small", model_dir="./models", use_cache=True):
+    def __init__(self, model_name="openai/whisper-large-v3-turbo", model_dir="./models", use_cache=True):
         """
         STT 모델 초기화
         
@@ -208,7 +208,7 @@ class STTModel:
         """
         return self._transcribe_long_audio_improved(audio, language, chunk_length_s)
 
-    def _transcribe_long_audio_improved(self, audio, language="korean", chunk_length_s=30, overlap_s=5, dedup_strength=0.5):
+    def _transcribe_long_audio_improved(self, audio, language="korean", chunk_length_s=30, overlap_s=0, dedup_strength=0.5):
         """
         긴 오디오 파일을 청크로 나누어 처리 (개선된 버전)
         
@@ -281,52 +281,6 @@ class STTModel:
         # 오버랩 처리 및 중복 제거
         if len(transcriptions) > 1:
             merged_text = transcriptions[0]
-            
-            for i in range(1, len(transcriptions)):
-                current_text = transcriptions[i]
-                
-                # 이전 청크의 마지막 부분과 현재 청크의 시작 부분에서 중복 찾기
-                prev_words = merged_text.split()[-15:]  # 이전 청크의 마지막 15개 단어
-                curr_words = current_text.split()[:15]  # 현재 청크의 처음 15개 단어
-                
-                if args.verbose:
-                    print(f"이전 청크 끝: {' '.join(prev_words)}")
-                    print(f"현재 청크 시작: {' '.join(curr_words)}")
-                
-                # 가장 긴 공통 부분 문자열 찾기
-                overlap_found = False
-                
-                # 단어 기반 중복 검사
-                for window_size in range(min(len(prev_words), len(curr_words)), 2, -1):
-                    for i in range(len(prev_words) - window_size + 1):
-                        prev_window = ' '.join(prev_words[i:i+window_size])
-                        
-                        if prev_window in current_text:
-                            # 중복 부분 이후의 텍스트만 추가
-                            overlap_idx = current_text.find(prev_window) + len(prev_window)
-                            non_duplicate_text = current_text[overlap_idx:].strip()
-                            
-                            if args.verbose:
-                                print(f"중복 감지: '{prev_window}'")
-                                print(f"중복 제거 후 추가할 텍스트: '{non_duplicate_text}'")
-                            
-                            if non_duplicate_text:
-                                merged_text += " " + non_duplicate_text
-                            else:
-                                if args.verbose:
-                                    print("중복 이후 추가할 텍스트가 없습니다.")
-                            
-                            overlap_found = True
-                            break
-                    
-                    if overlap_found:
-                        break
-                
-                # 중복을 찾지 못한 경우 그냥 추가
-                if not overlap_found:
-                    if args.verbose:
-                        print("중복을 찾지 못했습니다. 전체 텍스트를 추가합니다.")
-                    merged_text += " " + current_text
             
             # 후처리
             full_transcription = self._post_process_text(merged_text, dedup_strength)
@@ -443,9 +397,9 @@ class STTModel:
 if __name__ == "__main__":
     # 명령줄 인자 파싱
     parser = argparse.ArgumentParser(description="STT 모델을 사용하여 음성을 텍스트로 변환")
-    parser.add_argument("--model", type=str, default="openai/whisper-small", 
+    parser.add_argument("--model", type=str, default="openai/whisper-large-v3-turbo", 
                         choices=["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-small", 
-                                "openai/whisper-medium", "openai/whisper-large-v3"],
+                                "openai/whisper-medium", "openai/whisper-large-v3", "openai/whisper-large-v3-turbo"],
                         help="사용할 Whisper 모델 크기")
     parser.add_argument("--model_dir", type=str, default="./models", 
                         help="모델을 저장할 디렉토리 경로")

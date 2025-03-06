@@ -131,7 +131,7 @@ class STTModel:
                 print("다른 형식의 오디오 파일을 시도해보세요 (WAV 형식 권장).")
                 raise Exception(f"오디오 파일 로드 실패: {str(e)}, {str(e2)}")
     
-    def transcribe(self, audio, language="korean", chunk_length_s=30, overlap_s=5, dedup_strength=0.5):
+    def transcribe(self, audio, language="korean", chunk_length_s=5, overlap_s=0, dedup_strength=0.5):
         """
         오디오를 텍스트로 변환
         
@@ -201,14 +201,14 @@ class STTModel:
         # 후처리
         return self._post_process_text(transcription, dedup_strength)
         
-    def _transcribe_long_audio(self, audio, language="korean", chunk_length_s=30):
+    def _transcribe_long_audio(self, audio, language="korean", chunk_length_s=5):
         """
         긴 오디오 파일을 청크로 나누어 처리 (레거시 버전)
         이 함수는 하위 호환성을 위해 유지되며, 실제로는 개선된 버전을 사용합니다.
         """
         return self._transcribe_long_audio_improved(audio, language, chunk_length_s)
 
-    def _transcribe_long_audio_improved(self, audio, language="korean", chunk_length_s=30, overlap_s=0, dedup_strength=0.5):
+    def _transcribe_long_audio_improved(self, audio, language="korean", chunk_length_s=5, overlap_s=0, dedup_strength=0.5):
         """
         긴 오디오 파일을 청크로 나누어 처리 (개선된 버전)
         
@@ -407,10 +407,10 @@ if __name__ == "__main__":
                         help="캐시를 사용하지 않고 항상 모델을 다운로드")
     parser.add_argument("--file", type=str, default=None,
                         help="변환할 오디오 파일 경로 (지정하지 않으면 파일 선택 다이얼로그가 열립니다)")
-    parser.add_argument("--chunk-size", type=int, default=30,
-                        help="긴 오디오 파일을 처리할 때 사용할 청크 크기(초), 기본값: 30초")
-    parser.add_argument("--overlap", type=int, default=5,
-                        help="청크 간 오버랩 크기(초), 기본값: 5초")
+    parser.add_argument("--chunk-size", type=int, default=5,
+                        help="긴 오디오 파일을 처리할 때 사용할 청크 크기(초), 기본값: 5초")
+    parser.add_argument("--overlap", type=int, default=0,
+                        help="청크 간 오버랩 크기(초), 기본값: 0초")
     parser.add_argument("--dedup-strength", type=float, default=0.5,
                         help="중복 제거 강도 (0.0~1.0), 값이 클수록 더 적극적으로 중복 제거, 기본값: 0.5")
     parser.add_argument("--verbose", action="store_true",
